@@ -1,3 +1,9 @@
+"""
+Utility functions for setting up logging.
+
+This module configures a logger that outputs logs to both a file and the console.
+"""
+
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path

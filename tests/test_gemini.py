@@ -1,3 +1,10 @@
+"""
+Unit tests for Gemini LLM integration.
+
+These tests focus on the functionality of the Gemini LLM model integration,
+including response generation and error handling.
+"""
+
 from unittest.mock import patch
 
 import pytest
