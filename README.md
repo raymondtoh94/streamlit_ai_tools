@@ -15,12 +15,34 @@ The app includes multiple pages, each dedicated to a specific AI tool with **liv
 
 ## 🛠 Features
 
-- Streamlit-based interactive interface
-- Multiple pages for different Generative AI tools
-- Live demos and usage instructions
-- Easy-to-read documentation for each tool
-- Fully modular code structure for easy expansion
-- Clean portfolio-ready presentation
+### Core Components
+- Streamlit-based interactive web interface
+- Multi-page application structure
+- Configurable API integration with GROQ and Google AI
+- Environment variable management
+- Modular code architecture
+
+### AI Tools
+- **Text Summarizer**
+  - Multiple AI provider support (GROQ, Google)
+  - Customizable system instructions
+  - Model selection options
+  - Real-time text summarization
+
+### Technical Features
+- LangChain integration for LLM operations
+- Configurable model settings via TOML files
+- Interactive UI components
+- Comprehensive error handling
+- Legal disclaimer integration
+- Responsive layout design
+
+### Developer Features
+- Clean project structure
+- Easy dependency management with `uv`
+- Make commands for common operations
+- Configuration-based model management
+- Documentation and usage guidelines
 
 ---
 
@@ -54,7 +76,19 @@ make init       # Initialize uv project
 make install    # Install dependencies
 ```
 
-5. **Run the application**:
+5. **Configure API Keys**:
+- Create or modify `.streamlit/secrets.toml` using the template provided:
+```toml
+[GROQ]
+API_KEY="your-groq-api-key"
+
+[GOOGLE]
+API_KEY="your-google-api-key"
+```
+- Replace the placeholder values with your actual API keys
+- Never commit this file to version control
+
+6. **Run the application**:
 ```bash
 make streamlit  # Start the Streamlit app
 ```
