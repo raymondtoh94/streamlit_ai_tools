@@ -1,17 +1,21 @@
-import os
-import streamlit as st
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from src.models.llm import run_llm
 from src.utils.load import initialize_environment
 
 # Initialize environment variables for testing
 initialize_environment()
 
+
 # Mocked version for unit testing without calling real API
-@pytest.mark.parametrize("prompt", [
-    "Hello, how are you?",
-])
+@pytest.mark.parametrize(
+    "prompt",
+    [
+        "Hello, how are you?",
+    ],
+)
 def test_run_llm_parametrized(prompt):
     """Test run_llm with multiple prompts using mocking."""
     with patch("src.models.llm.run_llm") as mock_run:

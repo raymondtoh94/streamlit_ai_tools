@@ -1,7 +1,13 @@
 # 🚀 GenAI Tools Showcase
 
-[![Python](https://img.shields.io/badge/python-3.13-blue?logo=python&logoColor=white)](https://www.python.org/) 
+[![Python](https://img.shields.io/badge/python-3.13-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/streamlit-1.51-orange?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![Makefile](https://img.shields.io/badge/Make-%23008FBA.svg?style=flat&logo=gnu&logoColor=white)](https://www.gnu.org/software/make/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 ---
 
@@ -100,10 +106,12 @@ The app should now be running at `http://localhost:8501`
 - `make help` - Show all available commands
 - `make init` - Initialize uv project
 - `make install` - Install dependencies
-- `make add pkg=<package>` - Add a new dependency
-- `make remove pkg=<package>` - Remove a dependency
+- `make setup` - Set up project and install pre-commit hooks
+- `make pre-commit-install` - Install pre-commit hooks
+- `make pre-commit-run` - Run all pre-commit checks on all files
 - `make run` - Run the main app
 - `make streamlit` - Run Streamlit app
-- `make test` - Run tests
+- `make test` - Run pytest
 - `make format` - Format code using black and isort
-
+- `make lint` - Run ruff linter
+- `make clean` - Remove cache and temporary files
