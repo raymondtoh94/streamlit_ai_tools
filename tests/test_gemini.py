@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from src.models.llm import run_llm
-from src.utils.load import initialize_environment
+from src.utils.environment import initialize_environment
 
 # Initialize environment variables for testing
 initialize_environment()

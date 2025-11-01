@@ -1,37 +1,30 @@
-import os
-from pathlib import Path
-from typing import Any, Dict, Tuple
+"""
+Configuration loading utilities.
 
-import streamlit as st
+This module handles loading and parsing of configuration files from
+the config directory.
+"""
+
+from pathlib import Path
+from typing import Any, Dict
+
 import toml
 
 
-@st.cache_resource
-def initialize_environment():
-    """Load environment variables from a secrets.toml file."""
-    for external_app in st.secrets.keys():
-        print(f"Loading environment variables for {external_app}...")
-        for key, value in st.secrets[external_app].items():
-            print(f"Setting {external_app}_{key}...")
-            os.environ[external_app + "_" + key] = value
-
-    return True
-
-
-def load_config(
-    config_filename: str,
-) -> Tuple[Dict[Any, Any]]:
-    """Load configuration from a TOML file.
+def load_config(config_file: str) -> Dict[str, Any]:
+    """
+    Load a configuration file from the config directory.
 
     Args:
-        config_filename (str): The name of the configuration file.
-    Returns:
-        Tuple[Dict[Any, Any]]: The loaded configuration as a dictionary.
-    """
-    # Get the root directory (where Home.py is located)
-    root_dir = Path(os.getcwd())
-    config_path = root_dir / "config" / config_filename
+        config_file (str): Name of the configuration file to load
 
-    with open(config_path, "r") as config_file:
-        config = toml.load(config_file)
-    return config
+    Returns:
+        Dict[str, Any]: Parsed configuration data
+
+    Raises:
+        FileNotFoundError: If the configuration file doesn't exist
+    """
+    config_path = Path("config") / config_file
+    if not config_path.exists():
+        raise FileNotFoundError(f"Configuration file {config_file} not found")
+    return toml.load(config_path)
