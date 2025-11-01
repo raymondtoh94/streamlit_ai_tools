@@ -31,8 +31,10 @@ def initialize_environment() -> bool:
         for external_app in st.secrets.keys():
             logger.info(f"Loading environment variables for {external_app}")
             for key, value in st.secrets[external_app].items():
-                logger.debug(f"Setting {external_app}_{key}")
-                os.environ[external_app + "_" + key] = value
+                if key == "API_KEY":
+                    key = f"{external_app}_{key}"
+                logger.debug(f"Setting {key}")
+                os.environ[key] = value
 
         logger.info("Environment initialization completed successfully")
         return True
