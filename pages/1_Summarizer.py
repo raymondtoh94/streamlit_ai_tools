@@ -1,31 +1,45 @@
+import os
 import streamlit as st
-from src.utils.load import load_config
+from src.models.llm import run_llm
+from src.utils.load import load_config, initialize_environment
+from src.miscs.disclaimer import show_disclaimer_dialog
+
+# Initialize environment variables
+initialize_environment()
 
 # Load config
 instructions = load_config(
     "instructions.toml"
 )
 
+model_config = load_config(
+    "models.toml"
+)
+
+# Streamlit App
 st.set_page_config(page_title="Summarizer")
-
 st.title("Text Summarizer")
-sys_instr = st.text_area("System Instructions", height=100, value=instructions["summarizer"].get("instruction", ""))
 
+# Provider Selection
+model_config = load_config("models.toml")
+selected_provider = st.selectbox("Select Provider", options=[key.upper() for key in model_config.keys()])
+
+# Select Model based on Provider
+model_options = model_config[selected_provider].get("model", None)
+selected_model = st.selectbox("Select Model", options=model_options)
+
+# System Instructions
+sys_instr = st.text_area("System Instructions", height=250, value=instructions["summarizer"].get("instruction", ""))
+
+# Chat Input for Text to Summarize
 if prompt := st.chat_input():
-    st.write(f"System Prompt: {sys_instr}")
-    st.write(f"Summarizing the following text: {prompt}")
-
-@st.dialog("Legal disclaimer")
-def show_disclaimer_dialog():
-    st.caption("""
-        This application uses a Large Language Model (LLM) to generate responses.  
-        Please be aware that:
-        - The model may produce **inaccurate or biased information**.
-        - The model does not replace professional advice (legal, medical, financial, etc.).
-        - Use outputs at your own discretion.  
-
-        By using this app, you acknowledge that the developers are **not responsible** for decisions made based on the generated content.
-        """)
+    response = run_llm(
+        selected_provider=model_config[selected_provider].get("model_provider", None),
+        selected_model=selected_model,
+        prompt=f"{sys_instr}\n\nSummarize the following text:\n{prompt}"
+    )
+    
+    st.write(f"**Summary**: \n{response.content}")
 
 st.button(
     "&nbsp;:small[:gray[:material/balance: Legal disclaimer]]",
