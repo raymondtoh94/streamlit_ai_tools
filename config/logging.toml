@@ -1,0 +1,6 @@
+[logging]
+# Available levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
+level = "DEBUG"
+log_file = "app.log"
+max_size_mb = 1
+backup_count = 5
