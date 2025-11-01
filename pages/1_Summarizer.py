@@ -25,6 +25,10 @@ logger = setup_logger("summarizer")
 st.set_page_config(page_title="Summarizer")
 st.title("Text Summarizer")
 
+# Initialize session state for chat history
+if "page_1_messages" not in st.session_state:
+    st.session_state.page_1_messages = []
+
 # ------------------------------------------------------------------------
 # Model Selection Section
 # ------------------------------------------------------------------------
@@ -67,44 +71,45 @@ if selected_model != st.session_state.previous_model:
 sys_instr = st.text_area(
     "System Instructions",
     height=250,
-    value=st.session_state.instructions_config["summarizer"].get("instruction", ""),
+    value=st.session_state.instructions_config["summarizer"].get("sys_prompt", ""),
     help="Customize the instructions given to the AI model",
 )
 
 # ------------------------------------------------------------------------
 # Text Input and Summarization Section
 # ------------------------------------------------------------------------
-# Initialize session state for prompt tracking
-if "last_prompt" not in st.session_state:
-    st.session_state.last_prompt = None
 
 # Text input and processing
 if prompt := st.chat_input("Enter text to summarize..."):
-    if prompt != st.session_state.last_prompt:  # Prevent duplicate processing
-        logger.info("Received text for summarization")
-        try:
-            # Get provider configuration and run summarization
-            provider = st.session_state.model_config[selected_provider].get(
-                "model_provider", None
-            )
-            logger.debug(f"Using provider: {provider} with model: {selected_model}")
+    logger.info("Received text for summarization")
+    try:
+        # Get provider configuration and run summarization
+        provider = st.session_state.model_config[selected_provider].get(
+            "model_provider", None
+        )
+        logger.debug(f"Using provider: {provider} with model: {selected_model}")
 
-            response = run_llm(
-                selected_provider=provider,
-                selected_model=selected_model,
-                prompt=f"{sys_instr}\n\nSummarize the following text:\n{prompt}",
-            )
+        response = run_llm(
+            selected_provider=provider,
+            selected_model=selected_model,
+            prompt=f"{sys_instr}\n\nSummarize the following text:\n{prompt}",
+        )
 
-            # Display results
-            logger.info("Successfully generated summary")
-            st.write(f"**Summary**: \n{response.content}")
-            st.session_state.last_prompt = prompt
+        st.session_state.page_1_messages.append({"role": "user", "content": prompt})
+        st.session_state.page_1_messages.append(
+            {"role": "assistant", "content": response.content}
+        )
 
-        except Exception as e:
-            logger.error(f"Error during summarization: {str(e)}")
-            st.error(
-                "An error occurred while generating the summary. Please try again."
-            )
+        # Display results
+        logger.info("Successfully generated summary")
+
+    except Exception as e:
+        logger.error(f"Error during summarization: {str(e)}")
+        st.error("An error occurred while generating the summary. Please try again.")
+
+# Display chat messages
+for msg in st.session_state.page_1_messages:
+    st.chat_message(msg["role"]).write(msg["content"])
 
 # ------------------------------------------------------------------------
 # Footer Section
