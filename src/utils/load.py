@@ -1,7 +1,19 @@
 import os
 import toml
+import streamlit as st
 from pathlib import Path
 from typing import Any, Dict, Tuple
+
+@st.cache_resource
+def initialize_environment():
+    """Load environment variables from a secrets.toml file."""
+    for external_app in st.secrets.keys():
+        print(f"Loading environment variables for {external_app}...")
+        for key, value in st.secrets[external_app].items():
+            print(f"Setting {external_app}_{key}...")
+            os.environ[external_app + "_" + key] = value
+    
+    return True
 
 def load_config(
     config_filename: str,
