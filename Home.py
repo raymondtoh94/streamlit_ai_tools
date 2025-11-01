@@ -8,6 +8,7 @@ skills, and contact details in a clean, organized layout.
 import streamlit as st
 
 from src.utils.environment import initialize_environment
+from src.utils.load import load_config
 from src.utils.logger import setup_logger
 
 # ------------------------------------------------------------------------
@@ -21,6 +22,20 @@ logger = setup_logger("home")
 if "home_page_initialized" not in st.session_state:
     logger.info("Setting up home page")
     st.session_state.home_page_initialized = True
+
+
+# Load configuration files
+if "instructions_config" not in st.session_state:
+    st.session_state.instructions_config = None
+if "model_config" not in st.session_state:
+    st.session_state.model_config = None
+
+if st.session_state.instructions_config is None:
+    logger.info("Loading instructions configuration")
+    st.session_state.instructions_config = load_config("instructions.toml")
+if st.session_state.model_config is None:
+    logger.info("Loading model configuration")
+    st.session_state.model_config = load_config("models.toml")
 
 # ------------------------------------------------------------------------
 # Page Configuration
