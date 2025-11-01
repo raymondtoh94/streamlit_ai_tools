@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 from src.models.llm import run_llm
 from src.utils.load import load_config, initialize_environment
@@ -55,9 +54,12 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.info("**Python**\nCore programming language for logic and data handling")
+    st.info("**uv**\nManaging dependencies and virtual environments")
 
 with col2:
     st.info("**Streamlit**\nInteractive UI and web app framework")
+    st.info("**Groq** and **Google Gemini**\nAI model hosting platforms")
 
 with col3:
     st.info("**LLM**\nPowering text summarization using AI models")
+    st.info("**LangChain**\nFramework for developing LLM applications")
