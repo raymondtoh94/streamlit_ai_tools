@@ -26,13 +26,17 @@ init:  ## Initialize uv project (create pyproject.toml and venv)
 install:  ## Install all dependencies
 	uv sync
 
-.PHONY: add
-add:  ## Add a new dependency (usage: make add pkg=<package>)
-	uv add $(pkg)
+.PHONY: setup
+setup: install pre-commit-install  ## Set up project and install pre-commit hooks
+	@echo "Setup complete. You can now run make format, make lint, make test, etc."
 
-.PHONY: remove
-remove:  ## Remove a dependency (usage: make remove pkg=<package>)
-	uv remove $(pkg)
+.PHONY: pre-commit-install
+pre-commit-install:  ## Install pre-commit hooks
+	uv run pre-commit install
+
+.PHONY: pre-commit-run
+pre-commit-run:  ## Run all pre-commit checks on all files
+	uv run pre-commit run --all-files
 
 .PHONY: run
 run:  ## Run the main app (default: app.py)
@@ -52,11 +56,10 @@ format:  ## Format code using black and isort
 	uv run isort .
 
 .PHONY: lint
-lint:  ## Run flake8 or ruff linter
+lint:  ## Run ruff linter
 	uv run ruff check .
 
 .PHONY: clean
 clean:  ## Remove cache and temporary files
 	rm -rf __pycache__ .pytest_cache .ruff_cache
 	find . -type d -name '*.egg-info' -exec rm -rf {} +
-
