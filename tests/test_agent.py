@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.models.llm import run_agent
+from src.models.llm import create_llm_service
 from src.utils.environment import initialize_environment
 
 # Initialize environment variables for testing
@@ -25,19 +25,19 @@ initialize_environment()
 )
 def test_run_llm_parametrized(prompt):
     """Test run_llm with multiple prompts using mocking."""
-    with patch("src.models.llm.run_llm") as mock_run:
+    with patch("src.models.llm.create_llm_service") as mock_run:
         mock_run.return_value = f"Response to: {prompt}"
 
         config = {"configurable": {"thread_id": "1"}}
 
-        agent = run_agent(
-            selected_provider="groq",
-            selected_model="llama-3.1-8b-instant",
+        service = create_llm_service(
+            provider="groq",
+            model="llama-3.1-8b-instant",
             tools=[],
         )
 
-        response = agent.invoke(
-            {"messages": [{"role": "user", "content": f"{prompt}"}]},
+        response = service.get_agent_response(
+            messages=[{"role": "user", "content": f"{prompt}"}],
             config=config,
         )
 

@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.models.llm import run_llm
+from src.models.llm import create_llm_service
 from src.utils.environment import initialize_environment
 
 # Initialize environment variables for testing
@@ -25,10 +25,12 @@ initialize_environment()
 )
 def test_run_llm_parametrized(prompt):
     """Test run_llm with multiple prompts using mocking."""
-    with patch("src.models.llm.run_llm") as mock_run:
+    with patch("src.models.llm.create_llm_service") as mock_run:
         mock_run.return_value = f"Response to: {prompt}"
 
-        response = run_llm("groq", "llama-3.1-8b-instant", prompt)
+        service = create_llm_service(provider="groq", model="llama-3.1-8b-instant")
+
+        response = service.get_llm_response(prompt)
 
         assert response is not None
         assert isinstance(response.content, str)

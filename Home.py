@@ -5,12 +5,9 @@ This is the main landing page of the portfolio website. It displays personal inf
 skills, and contact details in a clean, organized layout.
 """
 
-import uuid
-
 import streamlit as st
 
 from src.utils.environment import initialize_environment
-from src.utils.load import load_config
 from src.utils.logger import setup_logger
 
 # ------------------------------------------------------------------------
@@ -19,34 +16,6 @@ from src.utils.logger import setup_logger
 # Initialize environment and logging
 initialize_environment()
 logger = setup_logger("home")
-
-# Check if page is being initialized for the first time
-if "home_page_initialized" not in st.session_state:
-    logger.info("Setting up home page")
-    st.session_state.home_page_initialized = True
-
-# If no session ID exists, create one
-if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
-
-# Load configuration files
-if "instructions_config" not in st.session_state:
-    st.session_state.instructions_config = None
-if "model_config" not in st.session_state:
-    st.session_state.model_config = None
-
-if st.session_state.instructions_config is None:
-    logger.info("Loading instructions configuration")
-    st.session_state.instructions_config = load_config("instructions.toml")
-if st.session_state.model_config is None:
-    logger.info("Loading model configuration")
-    st.session_state.model_config = load_config("models.toml")
-
-# Load middleware configuration
-if "middleware_config" not in st.session_state:
-    logger.info("Loading middleware configuration")
-    st.session_state.middleware_config = load_config("middleware.toml")
-
 
 # ------------------------------------------------------------------------
 # Page Configuration
