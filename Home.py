@@ -81,7 +81,7 @@ cols = st.columns(3)
 
 # Technical Skills
 with cols[0]:
-    st.markdown("**Tech Stack:**: Python, SQL, Bash, Spark, Pandas")
+    st.markdown("**Tech Stack:** Python, SQL, Bash, Spark, Pandas")
 
 # Frameworks
 with cols[1]:

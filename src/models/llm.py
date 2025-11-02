@@ -19,9 +19,6 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 
 def run_llm(selected_provider: str, selected_model: str, prompt: str):
-    print("Running LLM with the following parameters:")
-    print(f"Provider: {selected_provider}")
-    print(f"Model: {selected_model}")
 
     model = init_chat_model(
         model=selected_model,
@@ -41,7 +38,7 @@ def run_agent(selected_provider: str, selected_model: str, tools: List):
     checkpointer = st.session_state.checkpointer
 
     # Limit all tool calls
-    global_limiter = ToolCallLimitMiddleware(thread_limit=4, run_limit=2)
+    global_limiter = ToolCallLimitMiddleware(thread_limit=1, run_limit=1)
 
     # Optional summarization middleware to manage long conversations
     summarizer = SummarizationMiddleware(
