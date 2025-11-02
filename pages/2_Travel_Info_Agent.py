@@ -9,7 +9,7 @@ for travel information tasks.
 import streamlit as st
 
 from src.miscs.disclaimer import show_disclaimer_dialog
-from src.models.llm import run_agent
+from src.models.llm import create_llm_service
 from src.tools.web_search import web_search
 from src.utils.environment import initialize_environment
 from src.utils.logger import setup_logger
@@ -91,10 +91,13 @@ if prompt := st.chat_input("Enter desired travel destination..."):
         )
         logger.debug(f"Using provider: {provider} with model: {selected_model}")
 
-        agent = run_agent(
-            selected_provider=provider,
-            selected_model=selected_model,
+        service = create_llm_service(
+            provider=provider,
+            model=selected_model,
             tools=[web_search],
+            system_prompt=st.session_state.instructions_config["travel_info_agent"].get(
+                "sys_prompt", ""
+            ),
         )
 
         # `thread_id` is a unique identifier for a given conversation.
@@ -102,9 +105,8 @@ if prompt := st.chat_input("Enter desired travel destination..."):
 
         st.session_state.page_2_messages.append({"role": "user", "content": prompt})
 
-        for chunk in agent.stream(
-            {"messages": [{"role": "user", "content": f"{prompt}"}]},
-            stream_mode="updates",
+        for chunk in service.get_agent_stream(
+            messages=[{"role": "user", "content": f"{prompt}"}],
             config=config,
         ):
             for key, value in chunk.items():
@@ -129,7 +131,7 @@ if prompt := st.chat_input("Enter desired travel destination..."):
                     )
 
     except Exception as e:
-        logger.error(f"Error during summarization: {str(e)}")
+        logger.error(f"Error during travel info agent: {str(e)}")
         st.error(
             "An error occurred while generating the travel information. Please try again."
         )
@@ -163,12 +165,12 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.info("**Python**\nCore programming language for logic and data handling")
-    st.info("**uv**\nManaging dependencies and virtual environments")
+    st.info("**LangChain**\nFramework for LLM orchestration")
 
 with col2:
-    st.info("**Streamlit**\nInteractive UI and web app framework")
-    st.info("**Groq** and **Google Gemini**\nAI model hosting platforms")
+    st.info("**Streamlit**\nInteractive UI and web app framework and state management")
+    st.info("**LangGraph**\nAgent workflow and checkpointing")
 
 with col3:
-    st.info("**LLM**\nPowering text summarization using AI models")
-    st.info("**LangChain**\nFramework for developing LLM applications")
+    st.info("**Custom Middleware**\nTool limits, summarization, and fallbacks")
+    st.info("**Web Search Tools**\ Search capabilities")

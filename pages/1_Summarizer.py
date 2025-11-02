@@ -9,7 +9,7 @@ for text summarization tasks.
 import streamlit as st
 
 from src.miscs.disclaimer import show_disclaimer_dialog
-from src.models.llm import run_llm
+from src.models.llm import create_llm_service
 from src.utils.environment import initialize_environment
 from src.utils.load import load_config
 from src.utils.logger import setup_logger
@@ -89,10 +89,13 @@ if prompt := st.chat_input("Enter text to summarize..."):
         )
         logger.debug(f"Using provider: {provider} with model: {selected_model}")
 
-        response = run_llm(
-            selected_provider=provider,
-            selected_model=selected_model,
-            prompt=f"{sys_instr}\n\nSummarize the following text:\n{prompt}",
+        service = create_llm_service(
+            provider=provider,
+            model=selected_model,
+        )
+
+        response = service.get_llm_response(
+            f"{sys_instr}\n\nSummarize the following text:\n{prompt}"
         )
 
         st.session_state.page_1_messages.append({"role": "user", "content": prompt})

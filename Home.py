@@ -42,6 +42,11 @@ if st.session_state.model_config is None:
     logger.info("Loading model configuration")
     st.session_state.model_config = load_config("models.toml")
 
+# Load middleware configuration
+if "middleware_config" not in st.session_state:
+    logger.info("Loading middleware configuration")
+    st.session_state.middleware_config = load_config("middleware.toml")
+
 
 # ------------------------------------------------------------------------
 # Page Configuration
