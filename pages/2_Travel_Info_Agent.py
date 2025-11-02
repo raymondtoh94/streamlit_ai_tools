@@ -99,27 +99,38 @@ if prompt := st.chat_input("Enter desired travel destination..."):
         # `thread_id` is a unique identifier for a given conversation.
         config = {"configurable": {"thread_id": st.session_state.session_id}}
 
-        response = agent.invoke(
-            {"messages": [{"role": "user", "content": f"{prompt}"}]},
-            config=config,
-        )
-
-        ai_response = response["messages"][-1].content
-
         st.session_state.page_2_messages.append({"role": "user", "content": prompt})
-        st.session_state.page_2_messages.append(
-            {"role": "assistant", "content": ai_response}
-        )
+
+        for chunk in agent.stream(
+            {"messages": [{"role": "user", "content": f"{prompt}"}]},
+            stream_mode="updates",
+            config=config,
+        ):
+            for key, value in chunk.items():
+                logger.info(f"Agent Calls -> {chunk}")
+                if key == "model":
+                    st.session_state.page_2_messages.append(
+                        {"role": "assistant", "content": value["messages"][-1].content}
+                    )
+                else:
+                    st.session_state.page_2_messages.append(
+                        {"role": "tools", "content": chunk}
+                    )
 
     except Exception as e:
-        logger.error(f"Error during agent run: {str(e)}")
+        logger.error(f"Error during summarization: {str(e)}")
         st.error(
             "An error occurred while generating the travel information. Please try again."
         )
 
 # Display chat messages
 for msg in st.session_state.page_2_messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+    if msg["role"] == "tools":
+        for key, value in msg["content"].items():
+            with st.expander(f"🤖 **Agent Triggered**: {key}"):
+                st.write(f"💬 **Response**: {str(value)}")
+    else:
+        st.chat_message(msg["role"]).write(msg["content"])
 
 
 # ------------------------------------------------------------------------
