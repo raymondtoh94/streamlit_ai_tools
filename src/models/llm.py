@@ -38,7 +38,7 @@ def run_agent(selected_provider: str, selected_model: str, tools: List):
     checkpointer = st.session_state.checkpointer
 
     # Limit all tool calls
-    global_limiter = ToolCallLimitMiddleware(thread_limit=1, run_limit=1)
+    global_limiter = ToolCallLimitMiddleware(thread_limit=6, run_limit=20)
 
     # Optional summarization middleware to manage long conversations
     summarizer = SummarizationMiddleware(
@@ -58,6 +58,9 @@ def run_agent(selected_provider: str, selected_model: str, tools: List):
     # Create the agent with specified model, tools, and middleware
     agent = create_agent(
         model=f"{selected_provider}:{selected_model}",
+        system_prompt=st.session_state.instructions_config["travel_info_agent"].get(
+            "sys_prompt", ""
+        ),
         tools=tools,
         middleware=[global_limiter, summarizer, fallback_model],
         checkpointer=checkpointer,
