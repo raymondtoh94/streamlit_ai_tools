@@ -10,6 +10,7 @@ import streamlit as st
 
 from src.miscs.disclaimer import show_disclaimer_dialog
 from src.models.llm import run_agent
+from src.tools.web_search import web_search
 from src.utils.environment import initialize_environment
 from src.utils.logger import setup_logger
 
@@ -93,7 +94,7 @@ if prompt := st.chat_input("Enter desired travel destination..."):
         agent = run_agent(
             selected_provider=provider,
             selected_model=selected_model,
-            tools=[],
+            tools=[web_search],
         )
 
         # `thread_id` is a unique identifier for a given conversation.
@@ -109,8 +110,18 @@ if prompt := st.chat_input("Enter desired travel destination..."):
             for key, value in chunk.items():
                 logger.info(f"Agent Calls -> {chunk}")
                 if key == "model":
+                    if isinstance(value["messages"][-1].content, list):
+                        ai_response = value["messages"][-1].content[-1]["text"]
+                    elif (value["messages"][-1].content == "") and (
+                        value["messages"][-1].tool_calls
+                    ):
+                        tool_call = value["messages"][-1].tool_calls[-1]
+                        ai_response = f"Tool[{tool_call['name'].upper()}] invoked with input: {tool_call['args']["query"]}"
+                    else:
+                        ai_response = value["messages"][-1].content
+
                     st.session_state.page_2_messages.append(
-                        {"role": "assistant", "content": value["messages"][-1].content}
+                        {"role": "assistant", "content": ai_response}
                     )
                 else:
                     st.session_state.page_2_messages.append(
