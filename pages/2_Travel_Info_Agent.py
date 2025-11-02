@@ -112,7 +112,7 @@ if prompt := st.chat_input("Enter desired travel destination..."):
         )
 
     except Exception as e:
-        logger.error(f"Error during summarization: {str(e)}")
+        logger.error(f"Error during agent run: {str(e)}")
         st.error(
             "An error occurred while generating the travel information. Please try again."
         )
