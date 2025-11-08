@@ -173,4 +173,4 @@ with col2:
 
 with col3:
     st.info("**Custom Middleware**\nTool limits, summarization, and fallbacks")
-    st.info("**Web Search Tools**\ Search capabilities")
+    st.info("**Web Search Tools**\n Search capabilities")
