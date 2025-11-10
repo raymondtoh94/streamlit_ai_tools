@@ -1,7 +1,7 @@
 """
-Unit tests for Gemini LLM integration.
+Unit tests for Agent LLM integration.
 
-These tests focus on the functionality of the Gemini LLM model integration,
+These tests focus on the functionality of the Agent LLM model integration,
 including response generation and error handling.
 """
 
@@ -28,9 +28,20 @@ def test_run_llm_parametrized(prompt):
     with patch("src.models.llm.create_llm_service") as mock_run:
         mock_run.return_value = f"Response to: {prompt}"
 
-        service = create_llm_service(provider="google_genai", model="gemini-2.5-flash")
+        config = {"configurable": {"thread_id": "1"}}
 
-        response = service.get_llm_response(prompt)
+        service = create_llm_service(
+            provider="groq",
+            model="llama-3.1-8b-instant",
+            tools=[],
+        )
+
+        response = service.get_agent_response(
+            messages=[{"role": "user", "content": f"{prompt}"}],
+            config=config,
+        )
+
+        ai_response = response["messages"][-1].content
 
         assert response is not None
-        assert isinstance(response.content, str)
+        assert isinstance(ai_response, str)

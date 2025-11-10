@@ -1,3 +1,11 @@
+"""
+Legal disclaimer dialog for the application.
+
+This module defines a Streamlit dialog that displays a legal disclaimer
+to inform users about the limitations and responsibilities associated with
+the use of AI-generated content.
+"""
+
 import streamlit as st
 
 

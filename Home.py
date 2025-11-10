@@ -17,11 +17,6 @@ from src.utils.logger import setup_logger
 initialize_environment()
 logger = setup_logger("home")
 
-# Check if page is being initialized for the first time
-if "home_page_initialized" not in st.session_state:
-    logger.info("Setting up home page")
-    st.session_state.home_page_initialized = True
-
 # ------------------------------------------------------------------------
 # Page Configuration
 # ------------------------------------------------------------------------
@@ -60,7 +55,7 @@ cols = st.columns(3)
 
 # Technical Skills
 with cols[0]:
-    st.markdown("**Tech Stack:**: Python, SQL, Bash, Spark, Pandas")
+    st.markdown("**Tech Stack:** Python, SQL, Bash, Spark, Pandas")
 
 # Frameworks
 with cols[1]:

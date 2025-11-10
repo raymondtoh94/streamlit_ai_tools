@@ -1,0 +1,15 @@
+[tool_limit]
+enabled = true
+thread_limit = 6
+run_limit = 20
+
+[summarization]
+enabled = true
+model = "groq:llama-3.3-70b-versatile"
+max_tokens = 4000
+messages_to_keep = 20
+
+[model_fallback]
+enabled = true
+primary_model = "groq:llama-3.3-70b-versatile"
+fallback_model = "google_genai:gemini-2.5-flash-lite"
