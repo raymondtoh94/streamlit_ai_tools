@@ -3,20 +3,11 @@ This Page uses auto executed code blocks from agents to build a customized tool 
 The tools generated are static utilities that don't require external APIs or ML models.
 """
 
-# ------------------------------------------------------------------------
-# Standard Library Imports
-# ------------------------------------------------------------------------
 import re
 from datetime import datetime
 
-# ------------------------------------------------------------------------
-# Third Party Imports
-# ------------------------------------------------------------------------
 import streamlit as st
 
-# ------------------------------------------------------------------------
-# Local Imports
-# ------------------------------------------------------------------------
 from src.models.llm import create_llm_service
 from src.utils.environment import initialize_environment
 from src.utils.logger import setup_logger
@@ -31,52 +22,6 @@ logger = setup_logger("customized_tools")
 # Configure page
 st.set_page_config(page_title="Customized Tools")
 st.title("Customized Tools")
-
-
-# ------------------------------------------------------------------------
-# System Instructions
-# ------------------------------------------------------------------------
-sys_instr = """You are an expert Stream Lit developer focusing on static programming tools.
-You will generate code for customized tools based on user requirements, but ONLY create tools that use standard programming operations
-and utilities (no machine learning, AI, or external API calls).
-
-Important Instructions:
-1. Return your answer as python code delimiter within <execute_python> </execute_python> tags.
-2. For ALL interactive elements (buttons, inputs, etc.), use unique keys:
-   - st.button("Click me", key="unique_button_1")
-   - st.text_input("Enter text", key="unique_input_1")
-
-3. Initialize ALL required session state variables at the start of your code:
-   - if 'variable_name' not in st.session_state:
-       st.session_state.variable_name = initial_value
-
-4. For any button interactions, use callbacks to handle the logic:
-   def button_callback():
-       st.session_state.result = process_data()
-
-   st.button("Process", key="process_btn", on_click=button_callback)
-
-5. Always show the current state or results:
-   if 'result' in st.session_state:
-       st.write(st.session_state.result)
-
-6. Structure your code in this order:
-   - Session state initialization
-   - Function definitions
-   - UI elements
-   - Result display
-
-7. Use st.form when multiple inputs need to be submitted together:
-   with st.form(key="my_form"):
-       # form elements
-       submitted = st.form_submit_button("Submit")
-
-8. Handle errors gracefully and show meaningful messages to users:
-   try:
-       # your code
-   except Exception as e:
-       st.error(f"Error: {str(e)}")
-"""
 
 
 # ------------------------------------------------------------------------
@@ -100,56 +45,61 @@ def generate_and_execute_tools(user_requirements: str) -> None:
     """Generate and execute customized tools based on user requirements."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    # Log user requirements
-    try:
-        with open("logs/user_requirements.log", "a") as f:
-            f.write(f"[{timestamp}] User Requirements:\n{user_requirements}\n\n")
-        logger.info(f"Logged user requirements at {timestamp}")
-    except Exception as e:
-        logger.error(f"Error logging user requirements: {e}")
-
-    # Generate tool using LLM
-    llm_service = create_llm_service(
-        model="gemini-2.5-flash",
-        provider="google_genai",
-    )
-
-    response = llm_service.get_llm_response(
-        f"{sys_instr}\n\n User Requirements:\n{user_requirements}"
-    )
-
-    # Extract code blocks
-    response_content = (
-        str(response.content) if hasattr(response, "content") else str(response)
-    )
-    code_blocks = re.findall(
-        r"<execute_python>(.*?)</execute_python>", response_content, re.DOTALL
-    )
-
-    # Store code blocks in session state to persist across refreshes
-    st.session_state.code_blocks = code_blocks
-    st.session_state.timestamp = timestamp
-
-    # Execute each code block
-    for i, code in enumerate(code_blocks, 1):
-        st.markdown(f"#### 🔧 Generated Tool Code Block {i}")
+    with st.spinner("🔄 Generating your customized tools... Please wait..."):
+        # Log user requirements
         try:
-            exec(code, globals())
-            logger.info(f"[{timestamp}] Successfully executed code block {i}")
+            with open("logs/user_requirements.log", "a") as f:
+                f.write(f"[{timestamp}] User Requirements:\n{user_requirements}\n\n")
+            logger.info(f"Logged user requirements at {timestamp}")
         except Exception as e:
-            st.error(f"Error executing code block {i}: {str(e)}")
-            logger.error(f"[{timestamp}] Error executing code block {i}: {e}")
+            logger.error(f"Error logging user requirements: {e}")
 
-    if not code_blocks:
-        st.error(
-            "No valid tools were generated. Please try rephrasing your requirements."
+        sys_instr = st.session_state.instructions_config["customized_tools"].get(
+            "sys_prompt", ""
         )
-        logger.warning(f"[{timestamp}] No valid code blocks generated")
-        return
 
-    # Save generated code blocks
-    save_code_blocks(code_blocks, timestamp)
-    logger.info(f"[{timestamp}] Generated {len(code_blocks)} code blocks")
+        # Generate tool using LLM
+        llm_service = create_llm_service(
+            model="claude-sonnet-4-5-20250929",
+            provider="anthropic",
+        )
+
+        response = llm_service.get_llm_response(
+            f"{sys_instr}\n\n User Requirements:\n{user_requirements}"
+        )
+
+        # Extract code blocks
+        response_content = (
+            str(response.content) if hasattr(response, "content") else str(response)
+        )
+        code_blocks = re.findall(
+            r"<execute_python>(.*?)</execute_python>", response_content, re.DOTALL
+        )
+
+        # Store code blocks in session state to persist across refreshes
+        st.session_state.code_blocks = code_blocks
+        st.session_state.timestamp = timestamp
+
+        # Execute each code block
+        for i, code in enumerate(code_blocks, 1):
+            st.markdown(f"#### 🔧 Generated Tool Code Block {i}")
+            try:
+                exec(code, globals())
+                logger.info(f"[{timestamp}] Successfully executed code block {i}")
+            except Exception as e:
+                st.error(f"Error executing code block {i}: {str(e)}")
+                logger.error(f"[{timestamp}] Error executing code block {i}: {e}")
+
+        if not code_blocks:
+            st.error(
+                "No valid tools were generated. Please try rephrasing your requirements."
+            )
+            logger.warning(f"[{timestamp}] No valid code blocks generated")
+            return
+
+        # Save generated code blocks
+        save_code_blocks(code_blocks, timestamp)
+        logger.info(f"[{timestamp}] Generated {len(code_blocks)} code blocks")
 
 
 # ------------------------------------------------------------------------
